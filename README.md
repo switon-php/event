@@ -10,6 +10,8 @@ composer require switon/event
 
 **Requirements:** PHP 8.3+
 
+Development: install dev dependencies before running package tests.
+
 ## Quick Start
 
 ```php
