@@ -42,6 +42,11 @@
       "Switon\\Eventing\\Tests\\": "tests/"
     }
   },
+  "config": {
+    "allow-plugins": {
+      "switon/composer-extra": true
+    }
+  },
   "extra": {
     "switon": {
       "providers": [
