@@ -1,0 +1,49 @@
+{
+  "name": "switon/event",
+  "description": "PSR-14 event dispatching and listener discovery for Switon Framework",
+  "type": "library",
+  "keywords": [
+    "switon",
+    "events",
+    "psr-14",
+    "listeners"
+  ],
+  "homepage": "https://github.com/switon-php/event",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "switon",
+      "email": "admin@switon.dev"
+    }
+  ],
+  "support": {
+    "source": "https://github.com/switon-php/event",
+    "issues": "https://github.com/switon-php/event/issues",
+    "docs": "https://docs.switon.dev/latest/event"
+  },
+  "require": {
+    "php": ">=8.3",
+    "psr/event-dispatcher": "^1.0",
+    "switon/core": "^1.0"
+  },
+  "require-dev": {
+    "switon/di": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Switon\\Eventing\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Switon\\Eventing\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "switon": {
+      "providers": [
+        "Switon\\Eventing\\ServiceProvider"
+      ]
+    }
+  }
+}
