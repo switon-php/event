@@ -30,5 +30,4 @@ jobs:
         run: composer validate --no-check-lock --no-plugins
 
       - name: Run fast package tests
-        working-directory: tests
-        run: bash run.sh --fast
+        run: vendor/bin/phpunit --configuration tests/phpunit.xml.dist --testsuite=unit --display-deprecations --display-phpunit-notices
