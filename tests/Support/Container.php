@@ -10,18 +10,12 @@ use Switon\Core\ContainerInterface;
 use Switon\Core\ContextManagerInterface;
 use Switon\Core\PathAlias;
 use Switon\Core\PathAliasInterface;
-use Switon\Di\Container as DiContainer;
-use Switon\Di\ServiceProvider as DiServiceProvider;
 
-final class Container extends DiContainer
+final class Container extends SimpleContainer
 {
     public function __construct(array $definitions = [])
     {
         parent::__construct($definitions);
-
-        $diProvider = new DiServiceProvider();
-        $diProvider->register($this);
-        $diProvider->boot();
 
         App::setContainer($this);
 
