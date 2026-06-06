@@ -1,0 +1,12 @@
+parameters:
+    ignoreErrors:
+        -
+            identifier: foreach.nonIterable
+        -
+            identifier: callable.nonCallable
+        -
+            identifier: isset.offset
+        -
+            identifier: argument.type
+            path: src/EventDispatcher.php
+            message: '~recordBusinessInvocation\(\) expects object\|null, class-string\|object given~'

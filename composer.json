@@ -1,0 +1,66 @@
+{
+    "name": "switon/event",
+    "description": "Class-based synchronous PSR-14 dispatch with attribute-discovered listeners for Switon Framework",
+    "type": "library",
+    "keywords": [
+        "switon",
+        "events",
+        "psr-14",
+        "listeners"
+    ],
+    "homepage": "https://github.com/switon-php/event",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "switon",
+            "email": "admin@switon.dev"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/switon-php/event",
+        "issues": "https://github.com/switon-php/event/issues",
+        "docs": "https://docs.switon.dev/latest/event"
+    },
+    "require": {
+        "php": ">=8.3",
+        "psr/event-dispatcher": "^1.0",
+        "psr/log": "^2.0",
+        "switon/composer-extra": "^1.0",
+        "switon/core": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.0",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/extension-installer": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Switon\\Eventing\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Switon\\Eventing\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "switon/composer-extra": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "scripts": {
+        "phpstan": "@php vendor/bin/phpstan analyse",
+        "test": "@php vendor/bin/phpunit --configuration tests/phpunit.xml.dist --testsuite=all --display-deprecations --display-phpunit-notices"
+    },
+    "extra": {
+        "switon": {
+            "providers": [
+                "Switon\\Eventing\\ServiceProvider"
+            ]
+        },
+        "branch-alias": {
+            "dev-dev": "1.0.x-dev"
+        }
+    }
+}
