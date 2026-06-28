@@ -8,8 +8,14 @@ use Switon\Eventing\Exception\InvalidListenerException;
 use Switon\Eventing\EventDispatcher;
 use Switon\Eventing\EventDispatcherInterface;
 use Switon\Eventing\ListenerProvider;
+use Switon\Eventing\Tests\Fixtures\EngineAwareResourceStub;
+use Switon\Eventing\Tests\Fixtures\EngineAwareSenderTestEvent;
 use Switon\Eventing\Tests\Fixtures\HolderWithEmitterStub;
+use Switon\Eventing\Tests\Fixtures\HolderWithHttpClientStub;
 use Switon\Eventing\Tests\Fixtures\HolderWithOwnerStub;
+use Switon\Eventing\Tests\Fixtures\HolderWithRedisStub;
+use Switon\Eventing\Tests\Fixtures\HttpClientOwnerStub;
+use Switon\Eventing\Tests\Fixtures\HttpClientSenderTestEvent;
 use Switon\Eventing\Tests\Fixtures\OwnerAwareResourceStub;
 use Switon\Eventing\Tests\Fixtures\OwnerAwareSenderTestEvent;
 use Switon\Eventing\Tests\Fixtures\OwnerHolderStub;
@@ -23,6 +29,15 @@ use Switon\Eventing\Tests\Support\Container;
 use Switon\Eventing\Tests\Support\InMemoryContextManager;
 use Switon\Eventing\Tests\TestCase;
 
+/**
+ * Sender-scoped registration and dispatch.
+ *
+ * Canonical production patterns (see {@see ListenerProviderInterface::on()}):
+ * - Redis: {@see HolderWithRedisStub} + {@see OwnerAwareSenderTestEvent} stand in for
+ *   <code>$service->redis</code> + pooled connection events.
+ * - HTTP client: {@see HolderWithHttpClientStub} + {@see EngineAwareSenderTestEvent} /
+ *   {@see HttpClientSenderTestEvent} stand in for <code>$service->httpClient</code> + engine or client events.
+ */
 final class ListenerProviderSenderScopedTest extends TestCase
 {
     protected ListenerProvider $provider;
@@ -219,5 +234,56 @@ final class ListenerProviderSenderScopedTest extends TestCase
 
         $this->provider->on(new WrongHolderStub(), static function (OwnerAwareSenderTestEvent $event): void {
         });
+    }
+
+    public function testOnResolvesServiceRedisPropertyForOwnerAwareConnectionEvent(): void
+    {
+        $client = new OwnerHolderStub('audit');
+        $other = new OwnerHolderStub('other');
+        $service = new HolderWithRedisStub($client);
+        $calls = 0;
+
+        $this->provider->on($service, static function (OwnerAwareSenderTestEvent $event) use (&$calls): void {
+            $calls++;
+        });
+
+        $this->dispatcher->dispatch(new OwnerAwareSenderTestEvent(new OwnerAwareResourceStub($client), 'yes'));
+        $this->dispatcher->dispatch(new OwnerAwareSenderTestEvent(new OwnerAwareResourceStub($other), 'no'));
+
+        $this->assertSame(1, $calls);
+    }
+
+    public function testOnResolvesServiceHttpClientPropertyForOwnerAwareEngineEvent(): void
+    {
+        $httpClient = new HttpClientOwnerStub();
+        $other = new HttpClientOwnerStub();
+        $service = new HolderWithHttpClientStub($httpClient);
+        $calls = 0;
+
+        $this->provider->on($service, static function (EngineAwareSenderTestEvent $event) use (&$calls): void {
+            $calls++;
+        });
+
+        $this->dispatcher->dispatch(new EngineAwareSenderTestEvent(new EngineAwareResourceStub($httpClient), 'yes'));
+        $this->dispatcher->dispatch(new EngineAwareSenderTestEvent(new EngineAwareResourceStub($other), 'no'));
+
+        $this->assertSame(1, $calls);
+    }
+
+    public function testOnResolvesServiceHttpClientPropertyForHttpClientEvent(): void
+    {
+        $httpClient = new HttpClientOwnerStub();
+        $other = new HttpClientOwnerStub();
+        $service = new HolderWithHttpClientStub($httpClient);
+        $calls = 0;
+
+        $this->provider->on($service, static function (HttpClientSenderTestEvent $event) use (&$calls): void {
+            $calls++;
+        });
+
+        $this->dispatcher->dispatch(new HttpClientSenderTestEvent($httpClient, 'yes'));
+        $this->dispatcher->dispatch(new HttpClientSenderTestEvent($other, 'no'));
+
+        $this->assertSame(1, $calls);
     }
 }

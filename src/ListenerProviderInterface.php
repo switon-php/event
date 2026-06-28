@@ -44,6 +44,11 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
      * <code>O</code> from {@see \Switon\Core\OwnerAwareInterface::getOwner()} when <code>T</code> is
      * owner-aware). Dispatch then matches {@see getListenersForSender()} against that key.
      *
+     * Guidance: Typical service holders inject a Redis or HTTP client on <code>$redis</code> /
+     * <code>$httpClient</code>. Registration scans those properties for <code>O</code>; dispatch
+     * matches pooled connection or engine events via one {@see \Switon\Core\OwnerAwareInterface::getOwner()}
+     * hop. Client-level HTTP events already send the client as <code>T</code> (scan only, no owner hop).
+     *
      * Road-signs (object sender scope):
      * - <code>$sender instanceof T</code> → register on <code>$sender</code>
      * - else <code>T</code> is owner-aware and <code>$sender instanceof O</code> → register on <code>$sender</code>
@@ -84,6 +89,10 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
 
     /**
      * Return grouped sender-scoped listeners for one dispatched event.
+     *
+     * Guidance: Typical owner-aware senders are pooled connections or transport engines; listeners
+     * registered on the owning client (or a service holder that scanned those properties) match after
+     * one {@see \Switon\Core\OwnerAwareInterface::getOwner()} hop.
      *
      * Road-signs:
      * - match {@see \Switon\Core\SenderAwareInterface::getSender()} bucket first
