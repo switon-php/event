@@ -18,6 +18,7 @@ use Switon\Eventing\Exception\InvalidListenerException;
  * - register() discovers listeners for any sender from <code>#[EventListener]</code>
  * - <code>on(null, $handler)</code> registers listeners for any sender
  * - <code>on($sender, $handler)</code> registers sender-scoped listeners manually
+ * - <code>on('#name', $handler)</code> resolves sender type from the handler event parameter
  * - on() infers event type from the handler's single typed parameter
  * - wildcard key is <code>*</code> for <code>object</code> listeners
  * - grouped buckets keep priority ordering
@@ -34,19 +35,22 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
      * Register one callable; event type is inferred from the handler signature.
      *
      * When <code>$sender</code> is null, the listener runs for every matching dispatch.
-     * When set, it runs only for {@see \Switon\Core\SenderAwareInterface} events whose
+     * When an object, it runs only for {@see \Switon\Core\SenderAwareInterface} events whose
      * {@see \Switon\Core\SenderAwareInterface::getSender()} is the same instance.
+     * When a string, it is a container service ID (<code>Type#name</code>) or a relative alias
+     * (<code>#name</code>); relative aliases use the handler's first event parameter to resolve
+     * the sender type via <code>getSender()</code>.
      *
      * The handler must declare exactly one typed parameter (event class, <code>object</code>, or union).
      * Lower priority values run earlier.
      *
-     * @param object|null $sender Dispatching instance filter, or null for global scope
+     * @param string|object|null $sender Dispatching instance filter, container ID, relative alias, or null for global scope
      * @param callable $handler Listener callback
      * @param int $priority Execution priority
      *
      * @throws InvalidListenerException When the handler signature is invalid
      */
-    public function on(?object $sender, callable $handler, int $priority = 0): void;
+    public function on(string|object|null $sender, callable $handler, int $priority = 0): void;
 
     /**
      * Register a listener class or instance (any sender).

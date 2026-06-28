@@ -24,6 +24,7 @@ use WeakMap;
 use function count;
 use function is_array;
 use function is_string;
+use function str_starts_with;
 
 /**
  * Registers and resolves listeners for PSR-14 event dispatching.
@@ -38,6 +39,7 @@ use function is_string;
  * Road-signs:
  * - register via on/register
  * - on(null, ...) is any sender; on($sender, ...) is sender-scoped
+ * - on('#name', ...) resolves sender type from the handler event parameter
  * - on() infers event type from handler signature
  * - reflect EventListener attributes on public methods
  * - object parameter means wildcard
@@ -115,13 +117,19 @@ class ListenerProvider implements ListenerProviderInterface
     }
 
     /** {@inheritDoc} */
-    public function on(?object $sender, callable $handler, int $priority = 0): void
+    public function on(string|object|null $sender, callable $handler, int $priority = 0): void
     {
-        foreach ($this->resolveHandlerEventTypes($handler) as $eventType) {
-            if ($sender !== null && $eventType === self::WILDCARD) {
-                InvalidListenerException::raise('Sender-scoped wildcard listeners are not supported.', ['event' => $eventType]);
+        $eventTypes = $this->resolveHandlerEventTypes($handler);
+
+        if (is_string($sender)) {
+            if (str_starts_with($sender, '#')) {
+                $sender = (new ReflectionMethod($eventTypes[0], 'getSender'))->getReturnType()->getName() . $sender;
             }
 
+            $sender = $this->container->get($sender);
+        }
+
+        foreach ($eventTypes as $eventType) {
             if ($sender === null) {
                 $listeners = &$this->listeners;
             } else {

@@ -84,6 +84,33 @@ final class ListenerProviderSenderScopedTest extends TestCase
         $this->assertSame(1, $delegate->calls);
     }
 
+    public function testOnRelativeSenderAliasResolvesFromSenderAwareEvent(): void
+    {
+        $primary = $this->container->get(SenderEmitterStub::class . '#primary');
+        $listener = new SenderScopedListener();
+
+        $this->provider->on('#primary', [$listener, 'onSenderAwareTestEvent']);
+
+        $this->dispatcher->dispatch(new SenderAwareTestEvent($primary, 'alias'));
+        $this->dispatcher->dispatch(new SenderAwareTestEvent($this->container->get(SenderEmitterStub::class . '#secondary')));
+
+        $this->assertSame(1, $listener->calls);
+        $this->assertSame('alias', $listener->lastPayload);
+    }
+
+    public function testOnNamedSenderAliasResolvesFromContainer(): void
+    {
+        $primary = $this->container->get(SenderEmitterStub::class . '#primary');
+        $listener = new SenderScopedListener();
+
+        $this->provider->on(SenderEmitterStub::class . '#primary', [$listener, 'onSenderAwareTestEvent']);
+
+        $this->dispatcher->dispatch(new SenderAwareTestEvent($primary, 'named'));
+
+        $this->assertSame(1, $listener->calls);
+        $this->assertSame('named', $listener->lastPayload);
+    }
+
     public function testMergeRunsGlobalBeforeSenderScopedAtSamePriority(): void
     {
         $sender = new SenderEmitterStub();

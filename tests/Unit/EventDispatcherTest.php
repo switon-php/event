@@ -118,7 +118,7 @@ final class StubListenerProvider implements ListenerProviderInterface
     ) {
     }
 
-    public function on(?object $sender, callable $handler, int $priority = 0): void
+    public function on(string|object|null $sender, callable $handler, int $priority = 0): void
     {
     }
 
