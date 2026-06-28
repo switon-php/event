@@ -118,7 +118,7 @@ final class StubListenerProvider implements ListenerProviderInterface
     ) {
     }
 
-    public function on(string $event, callable $handler, int $priority = 0): void
+    public function on(?object $sender, callable $handler, int $priority = 0): void
     {
     }
 
@@ -139,6 +139,11 @@ final class StubListenerProvider implements ListenerProviderInterface
     public function getListenersForWildcard(): PrioritizedListeners
     {
         return $this->wildcard;
+    }
+
+    public function getListenersForSender(object $event): PrioritizedListeners
+    {
+        return new PrioritizedListeners();
     }
 
     public function getObservabilityListenerRegistry(): array

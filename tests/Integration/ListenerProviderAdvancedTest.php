@@ -43,11 +43,11 @@ class ListenerProviderAdvancedTest extends TestCase
         $executionOrder = [];
 
         // Lower number = higher priority (executed first)
-        $this->provider->on(TestEvent::class, function () use (&$executionOrder) {
+        $this->provider->on(null, function (TestEvent $event) use (&$executionOrder) {
             $executionOrder[] = 'high';
         }, -10); // Higher priority (lower number)
 
-        $this->provider->on(TestEvent::class, function () use (&$executionOrder) {
+        $this->provider->on(null, function (TestEvent $event) use (&$executionOrder) {
             $executionOrder[] = 'low';
         }, 10); // Lower priority (higher number)
 

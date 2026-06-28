@@ -9,7 +9,7 @@ use Switon\Eventing\PrioritizedListeners;
 
 final class NullListenerProvider implements ListenerProviderInterface
 {
-    public function on(string $event, callable $handler, int $priority = 0): void
+    public function on(?object $sender, callable $handler, int $priority = 0): void
     {
     }
 
@@ -23,6 +23,11 @@ final class NullListenerProvider implements ListenerProviderInterface
     }
 
     public function getListenersForWildcard(): PrioritizedListeners
+    {
+        return new PrioritizedListeners();
+    }
+
+    public function getListenersForSender(object $event): PrioritizedListeners
     {
         return new PrioritizedListeners();
     }

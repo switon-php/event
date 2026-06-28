@@ -15,10 +15,13 @@ use Switon\Eventing\Exception\InvalidListenerException;
  * Guidance: Use union parameter types for one listener across multiple event classes, or <code>object</code> for wildcard listeners.
  *
  * Road-signs:
- * - register listeners via on/register
+ * - register() discovers listeners for any sender from <code>#[EventListener]</code>
+ * - <code>on(null, $handler)</code> registers listeners for any sender
+ * - <code>on($sender, $handler)</code> registers sender-scoped listeners manually
+ * - on() infers event type from the handler's single typed parameter
  * - wildcard key is <code>*</code> for <code>object</code> listeners
  * - grouped buckets keep priority ordering
- * - dispatcher consumes wildcard then event-specific
+ * - dispatcher consumes wildcard, event-specific, then sender-scoped
  *
  * @see \Switon\Eventing\PrioritizedListeners
  * @see \Switon\Eventing\ListenerProvider
@@ -28,22 +31,27 @@ use Switon\Eventing\Exception\InvalidListenerException;
 interface ListenerProviderInterface extends PsrListenerProviderInterface
 {
     /**
-     * Register one callable for a specific event class.
+     * Register one callable; event type is inferred from the handler signature.
      *
-     * Lower priority values run earlier. Use the wildcard event key for <code>object</code> listeners.
+     * When <code>$sender</code> is null, the listener runs for every matching dispatch.
+     * When set, it runs only for {@see \Switon\Core\SenderAwareInterface} events whose
+     * {@see \Switon\Core\SenderAwareInterface::getSender()} is the same instance.
      *
-     * @param string $event Event FQCN
+     * The handler must declare exactly one typed parameter (event class, <code>object</code>, or union).
+     * Lower priority values run earlier.
+     *
+     * @param object|null $sender Dispatching instance filter, or null for global scope
      * @param callable $handler Listener callback
      * @param int $priority Execution priority
+     *
+     * @throws InvalidListenerException When the handler signature is invalid
      */
-    public function on(string $event, callable $handler, int $priority = 0): void;
+    public function on(?object $sender, callable $handler, int $priority = 0): void;
 
     /**
-     * Register a listener class or instance.
+     * Register a listener class or instance (any sender).
      *
-     * Implementations may discover methods marked with
-     * <code>#[EventListener]</code>.
-     * A listener method should declare exactly one typed event parameter.
+     * Discovers public methods marked with <code>#[EventListener]</code> and delegates to {@see on()}.
      *
      * @param string|object $listener Class name or instance
      *
@@ -52,14 +60,22 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
     public function register(string|object $listener): void;
 
     /**
-     * Return grouped listeners for one event instance.
+     * Return grouped listeners for one event class (any sender).
      */
     public function getListenersForEvent(object $event): PrioritizedListeners;
 
     /**
-     * Return grouped wildcard listeners.
+     * Return grouped wildcard listeners (any sender).
      */
     public function getListenersForWildcard(): PrioritizedListeners;
+
+    /**
+     * Return grouped sender-scoped listeners for one dispatched event.
+     *
+     * Empty when the event is not {@see \Switon\Core\SenderAwareInterface} or no sender bucket matches
+     * {@see \Switon\Core\SenderAwareInterface::getSender()}.
+     */
+    public function getListenersForSender(object $event): PrioritizedListeners;
 
     /**
      * Get all registered listeners grouped by event class.

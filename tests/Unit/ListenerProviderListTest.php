@@ -17,11 +17,10 @@ class ListenerProviderListTest extends TestCase
         $objectHandler = new ListenerProviderListObjectHandler();
         $invokableHandler = new ListenerProviderListInvokableHandler();
 
-        $provider->on(TestEvent::class, [$objectHandler, 'handleEvent']);
-        $provider->on(TestEvent::class, [ListenerProviderListObjectHandler::class, 'handleStatic']);
-        $provider->on(TestEvent::class, $invokableHandler);
-        $provider->on(TestEvent::class, 'strlen');
-        $provider->on('*', static function (object $event): void {
+        $provider->on(null, [$objectHandler, 'handleEvent']);
+        $provider->on(null, [ListenerProviderListObjectHandler::class, 'handleStatic']);
+        $provider->on(null, $invokableHandler);
+        $provider->on(null, static function (object $event): void {
         });
 
         $listeners = $provider->getListeners();
@@ -33,7 +32,6 @@ class ListenerProviderListTest extends TestCase
                 ListenerProviderListObjectHandler::class . '::handleEvent',
                 ListenerProviderListObjectHandler::class . '::handleStatic',
                 ListenerProviderListInvokableHandler::class . '::__invoke',
-                'strlen',
             ],
             $listeners[TestEvent::class]
         );
@@ -44,9 +42,9 @@ class ListenerProviderListTest extends TestCase
         $provider = new ListenerProvider();
         $handler = new ListenerProviderListPriorityHandler();
 
-        $provider->on(TestEvent::class, [$handler, 'low'], 10);
-        $provider->on(TestEvent::class, [$handler, 'high'], -10);
-        $provider->on(TestEvent::class, [$handler, 'mid'], 0);
+        $provider->on(null, [$handler, 'low'], 10);
+        $provider->on(null, [$handler, 'high'], -10);
+        $provider->on(null, [$handler, 'mid'], 0);
 
         $listeners = $provider->getListeners();
 

@@ -22,6 +22,7 @@ use function is_array;
  * - event object can be any class
  * - wildcard first
  * - event-specific next
+ * - sender-scoped last
  * - StopFlow stops remaining listeners
  * - context tracks invocation counts
  *
@@ -49,6 +50,7 @@ class EventDispatcher implements EventDispatcherInterface
         try {
             $this->invokeListeners($event, $this->listenerProvider->getListenersForWildcard());
             $this->invokeListeners($event, $this->listenerProvider->getListenersForEvent($event));
+            $this->invokeListeners($event, $this->listenerProvider->getListenersForSender($event));
         } catch (StopFlow) {
             // Listener requested flow stop; return event without invoking remaining listeners
         }

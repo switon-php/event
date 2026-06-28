@@ -46,7 +46,7 @@ class ListenerProviderBasicTest extends TestCase
     {
         // Arrange
         $called = false;
-        $this->provider->on(TestEvent::class, function (TestEvent $event) use (&$called) {
+        $this->provider->on(null, function (TestEvent $event) use (&$called) {
             $called = true;
         });
 
@@ -148,7 +148,7 @@ class ListenerProviderBasicTest extends TestCase
     {
         $called = false;
 
-        $this->provider->on(TestEvent::class, function (TestEvent $event) use (&$called): void {
+        $this->provider->on(null, function (TestEvent $event) use (&$called): void {
             $called = true;
         });
 

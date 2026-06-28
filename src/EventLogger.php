@@ -136,7 +136,7 @@ class EventLogger implements EventLoggerInterface, ObservabilityProbe
     public function boot(): void
     {
         if ($this->enabled) {
-            $this->listenerProvider->on('*', [$this, 'onEvent']);
+            $this->listenerProvider->on(null, [$this, 'onEvent']);
         }
         $this->logger->info('Event logger boot', [
             'enabled' => $this->enabled,

@@ -98,7 +98,7 @@ class EventDispatcherBasicTest extends TestCase
         // Arrange
         $event = new TestEvent('test message');
         $called = false;
-        $this->listenerProvider->on(TestEvent::class, function (TestEvent $e) use (&$called, $event) {
+        $this->listenerProvider->on(null, function (TestEvent $e) use (&$called, $event) {
             $called = true;
             $this->assertSame($event, $e);
         });
@@ -189,10 +189,10 @@ class EventDispatcherBasicTest extends TestCase
         // Arrange: first listener throws StopFlow, second should not run
         $event = new TestEvent('test');
         $secondCalled = false;
-        $this->listenerProvider->on(TestEvent::class, function (TestEvent $e) {
+        $this->listenerProvider->on(null, function (TestEvent $e) {
             throw StopFlow::because('Stop after first');
         });
-        $this->listenerProvider->on(TestEvent::class, function (TestEvent $e) use (&$secondCalled) {
+        $this->listenerProvider->on(null, function (TestEvent $e) use (&$secondCalled) {
             $secondCalled = true;
         });
 
