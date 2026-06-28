@@ -35,11 +35,20 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
      * Register one callable; event type is inferred from the handler signature.
      *
      * When <code>$sender</code> is null, the listener runs for every matching dispatch.
-     * When an object, it runs only for {@see \Switon\Core\SenderAwareInterface} events whose
-     * {@see \Switon\Core\SenderAwareInterface::getSender()} is the same instance.
      * When a string, it is a container service ID (<code>Type#name</code>) or a relative alias
      * (<code>#name</code>); relative aliases use the handler's first event parameter to resolve
      * the sender type via <code>getSender()</code>.
+     *
+     * When an object, registration resolves the bucket key from the handler event's
+     * {@see \Switon\Core\SenderAwareInterface::getSender()} type <code>T</code> (and owner type
+     * <code>O</code> from {@see \Switon\Core\OwnerAwareInterface::getOwner()} when <code>T</code> is
+     * owner-aware). Dispatch then matches {@see getListenersForSender()} against that key.
+     *
+     * Road-signs (object sender scope):
+     * - <code>$sender instanceof T</code> → register on <code>$sender</code>
+     * - else <code>T</code> is owner-aware and <code>$sender instanceof O</code> → register on <code>$sender</code>
+     * - else scan <code>$sender</code> properties (<code>O</code> then <code>T</code> when owner-aware, else <code>T</code> only)
+     * - else {@see InvalidListenerException}
      *
      * The handler must declare exactly one typed parameter (event class, <code>object</code>, or union).
      * Lower priority values run earlier.
@@ -48,7 +57,7 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
      * @param callable $handler Listener callback
      * @param int $priority Execution priority
      *
-     * @throws InvalidListenerException When the handler signature is invalid
+     * @throws InvalidListenerException When the handler signature is invalid or sender scope cannot be resolved
      */
     public function on(string|object|null $sender, callable $handler, int $priority = 0): void;
 
@@ -76,8 +85,10 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
     /**
      * Return grouped sender-scoped listeners for one dispatched event.
      *
-     * Empty when the event is not {@see \Switon\Core\SenderAwareInterface} or no sender bucket matches
-     * {@see \Switon\Core\SenderAwareInterface::getSender()}.
+     * Road-signs:
+     * - match {@see \Switon\Core\SenderAwareInterface::getSender()} bucket first
+     * - else when sender is owner-aware, match {@see \Switon\Core\OwnerAwareInterface::getOwner()} bucket
+     * - else empty
      */
     public function getListenersForSender(object $event): PrioritizedListeners;
 

@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Switon\Eventing\Tests\Integration;
 
+use Switon\Eventing\Exception\InvalidListenerException;
 use Switon\Eventing\EventDispatcher;
 use Switon\Eventing\EventDispatcherInterface;
 use Switon\Eventing\ListenerProvider;
+use Switon\Eventing\Tests\Fixtures\HolderWithEmitterStub;
+use Switon\Eventing\Tests\Fixtures\HolderWithOwnerStub;
+use Switon\Eventing\Tests\Fixtures\OwnerAwareResourceStub;
+use Switon\Eventing\Tests\Fixtures\OwnerAwareSenderTestEvent;
+use Switon\Eventing\Tests\Fixtures\OwnerHolderStub;
 use Switon\Eventing\Tests\Fixtures\SenderAwareTestEvent;
 use Switon\Eventing\Tests\Fixtures\SenderEmitterStub;
 use Switon\Eventing\Tests\Fixtures\SenderScopedListener;
 use Switon\Eventing\Tests\Fixtures\SenderScopedListenerWithAttribute;
 use Switon\Eventing\Tests\Fixtures\TestEvent;
+use Switon\Eventing\Tests\Fixtures\WrongHolderStub;
 use Switon\Eventing\Tests\Support\Container;
 use Switon\Eventing\Tests\Support\InMemoryContextManager;
 use Switon\Eventing\Tests\TestCase;
@@ -140,5 +147,77 @@ final class ListenerProviderSenderScopedTest extends TestCase
         $this->dispatcher->dispatch(new TestEvent('x'));
 
         $this->assertFalse($called);
+    }
+
+    public function testSenderScopedListenerMatchesOwnerAwareSenderChain(): void
+    {
+        $holder = new OwnerHolderStub('primary');
+        $other = new OwnerHolderStub('secondary');
+        $calls = 0;
+
+        $this->provider->on($holder, static function (OwnerAwareSenderTestEvent $event) use (&$calls): void {
+            $calls++;
+        });
+
+        $this->dispatcher->dispatch(new OwnerAwareSenderTestEvent(new OwnerAwareResourceStub($holder), 'yes'));
+        $this->dispatcher->dispatch(new OwnerAwareSenderTestEvent(new OwnerAwareResourceStub($other), 'no'));
+
+        $this->assertSame(1, $calls);
+    }
+
+    public function testSenderScopedListenerPrefersDirectSenderBeforeOwnerChain(): void
+    {
+        $holder = new OwnerHolderStub('holder');
+        $resource = new OwnerAwareResourceStub($holder);
+        $order = [];
+
+        $this->provider->on($resource, static function (OwnerAwareSenderTestEvent $event) use (&$order): void {
+            $order[] = 'resource';
+        });
+        $this->provider->on($holder, static function (OwnerAwareSenderTestEvent $event) use (&$order): void {
+            $order[] = 'holder';
+        });
+
+        $this->dispatcher->dispatch(new OwnerAwareSenderTestEvent($resource));
+
+        $this->assertSame(['resource'], $order);
+    }
+
+    public function testOnResolvesHolderPropertyForNonOwnerAwareSenderType(): void
+    {
+        $emitter = new SenderEmitterStub();
+        $holder = new HolderWithEmitterStub($emitter);
+        $calls = 0;
+
+        $this->provider->on($holder, static function (SenderAwareTestEvent $event) use (&$calls): void {
+            $calls++;
+        });
+
+        $this->dispatcher->dispatch(new SenderAwareTestEvent($emitter));
+
+        $this->assertSame(1, $calls);
+    }
+
+    public function testOnResolvesHolderPropertyForOwnerAwareOwnerType(): void
+    {
+        $owner = new OwnerHolderStub('resolved');
+        $holder = new HolderWithOwnerStub($owner);
+        $calls = 0;
+
+        $this->provider->on($holder, static function (OwnerAwareSenderTestEvent $event) use (&$calls): void {
+            $calls++;
+        });
+
+        $this->dispatcher->dispatch(new OwnerAwareSenderTestEvent(new OwnerAwareResourceStub($owner)));
+
+        $this->assertSame(1, $calls);
+    }
+
+    public function testOnThrowsWhenSenderScopeCannotBeResolved(): void
+    {
+        $this->expectException(InvalidListenerException::class);
+
+        $this->provider->on(new WrongHolderStub(), static function (OwnerAwareSenderTestEvent $event): void {
+        });
     }
 }

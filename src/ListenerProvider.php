@@ -11,6 +11,7 @@ use ReflectionIntersectionType;
 use ReflectionMethod;
 use Switon\Core\Attribute\Autowired;
 use Switon\Core\Exception\InvalidArgumentException;
+use Switon\Core\OwnerAwareInterface;
 use Switon\Core\Reflections;
 use Switon\Core\SenderAwareInterface;
 use Switon\Eventing\Attribute\EventListener;
@@ -24,6 +25,7 @@ use WeakMap;
 use function count;
 use function is_array;
 use function is_string;
+use function is_subclass_of;
 use function str_starts_with;
 
 /**
@@ -108,12 +110,21 @@ class ListenerProvider implements ListenerProviderInterface
             return $this->emptyListeners;
         }
 
-        $events = $this->senderListeners[$event->getSender()] ?? null;
-        if ($events === null) {
-            return $this->emptyListeners;
+        $eventClass = $event::class;
+        $dispatchSender = $event->getSender();
+
+        if ($bucket = $this->senderListeners[$dispatchSender][$eventClass] ?? null) {
+            return $bucket;
         }
 
-        return $events[$event::class] ?? $this->emptyListeners;
+        if ($dispatchSender instanceof OwnerAwareInterface) {
+            $owner = $dispatchSender->getOwner();
+            if ($bucket = $this->senderListeners[$owner][$eventClass] ?? null) {
+                return $bucket;
+            }
+        }
+
+        return $this->emptyListeners;
     }
 
     /** {@inheritDoc} */
@@ -132,14 +143,16 @@ class ListenerProvider implements ListenerProviderInterface
         foreach ($eventTypes as $eventType) {
             if ($sender === null) {
                 $listeners = &$this->listeners;
+                $registrationSender = null;
             } else {
-                $this->senderListeners[$sender] ??= [];
-                $listeners = &$this->senderListeners[$sender];
+                $registrationSender = $this->normalizeRegisteredSender($sender, $eventType);
+                $this->senderListeners[$registrationSender] ??= [];
+                $listeners = &$this->senderListeners[$registrationSender];
             }
 
             ($listeners[$eventType] ??= new PrioritizedListeners())->add($handler, $priority);
 
-            if ($sender === null && is_array($handler) && isset($handler[0], $handler[1]) && is_object($handler[0])) {
+            if ($registrationSender === null && is_array($handler) && isset($handler[0], $handler[1]) && is_object($handler[0])) {
                 $this->notifyListenerRegistered($handler[0], $handler[1], $eventType);
             }
         }
@@ -213,6 +226,45 @@ class ListenerProvider implements ListenerProviderInterface
         }
 
         return $eventTypes;
+    }
+
+    /** @see ListenerProviderInterface::on() Sender scope resolution at registration. */
+    protected function normalizeRegisteredSender(object $sender, string $eventType): object
+    {
+        if ($eventType === self::WILDCARD) {
+            return $sender;
+        }
+
+        $senderType = is_subclass_of($eventType, SenderAwareInterface::class)
+            ? Reflections::getMethodReturnType($eventType, 'getSender')
+            : null;
+        if ($senderType === null) {
+            return $sender;
+        }
+
+        if ($sender instanceof $senderType) {
+            return $sender;
+        }
+
+        $ownerType = is_subclass_of($senderType, OwnerAwareInterface::class)
+            ? Reflections::getMethodReturnType($senderType, 'getOwner')
+            : null;
+
+        if ($ownerType !== null) {
+            if ($sender instanceof $ownerType) {
+                return $sender;
+            }
+
+            if ($resolved = Reflections::findPropertyValueByType($sender, $ownerType)) {
+                return $resolved;
+            }
+        }
+
+        if ($resolved = Reflections::findPropertyValueByType($sender, $senderType)) {
+            return $resolved;
+        }
+
+        InvalidListenerException::raise('Invalid sender scope.');
     }
 
     protected function notifyListenerRegistered(object $listener, string $method, string $eventType): void
