@@ -34,35 +34,33 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
     /**
      * Register one callable; event type is inferred from the handler signature.
      *
-     * When <code>$sender</code> is null, the listener runs for every matching dispatch.
-     * When a string, it is a container service ID (<code>Type#name</code>) or a relative alias
-     * (<code>#name</code>); relative aliases use the handler's first event parameter to resolve
-     * the sender type via <code>getSender()</code>.
+     * <code>null</code> matches every sender. A string is a container ID (<code>Type#name</code>) or a
+     * relative alias (<code>#name</code>, resolved from the handler event’s <code>getSender()</code> type).
      *
-     * When an object, registration resolves the bucket key from the handler event's
-     * {@see \Switon\Core\SenderAwareInterface::getSender()} type <code>T</code> (and owner type
-     * <code>O</code> from {@see \Switon\Core\OwnerAwareInterface::getOwner()} when <code>T</code> is
-     * owner-aware). Dispatch then matches {@see getListenersForSender()} against that key.
+     * An object registers on an anchor <code>O</code>: registration derives <code>O</code> from event
+     * sender type <code>T</code> ({@see \Switon\Core\SenderAwareInterface::getSender()}) and, when
+     * <code>T</code> is owner-aware, from {@see \Switon\Core\OwnerAwareInterface::getOwner()}; dispatch
+     * must reach the same <code>O</code> via {@see getListenersForSender()}.
      *
-     * Guidance: Typical service holders inject a Redis or HTTP client on <code>$redis</code> /
-     * <code>$httpClient</code>. Registration scans those properties for <code>O</code>; dispatch
-     * matches pooled connection or engine events via one {@see \Switon\Core\OwnerAwareInterface::getOwner()}
-     * hop. Client-level HTTP events already send the client as <code>T</code> (scan only, no owner hop).
+     * Guidance: Per-instance listening only works when registration and dispatch share one anchor—the
+     * instance you intend to monitor; if <code>$sender</code> cannot resolve that anchor, the emitter
+     * must link to it (typically {@see \Switon\Core\OwnerAwareInterface} at creation), otherwise use
+     * <code>on(null)</code>.
      *
-     * Road-signs (object sender scope):
-     * - <code>$sender instanceof T</code> → register on <code>$sender</code>
-     * - else <code>T</code> is owner-aware and <code>$sender instanceof O</code> → register on <code>$sender</code>
-     * - else scan <code>$sender</code> properties (<code>O</code> then <code>T</code> when owner-aware, else <code>T</code> only)
-     * - else {@see InvalidListenerException}
+     * Road-signs (object <code>$sender</code>):
+     * - <code>$sender instanceof T</code> → bucket on <code>$sender</code>
+     * - else owner-aware <code>T</code> and <code>$sender instanceof O</code> → bucket on <code>$sender</code>
+     * - else scan properties (<code>O</code> then <code>T</code>, or <code>T</code> only)
+     * - else {@see InvalidListenerException} (no anchor to hang on)
      *
      * The handler must declare exactly one typed parameter (event class, <code>object</code>, or union).
      * Lower priority values run earlier.
      *
-     * @param string|object|null $sender Dispatching instance filter, container ID, relative alias, or null for global scope
+     * @param string|object|null $sender Anchor instance, container ID, relative alias, or null for any sender
      * @param callable $handler Listener callback
      * @param int $priority Execution priority
      *
-     * @throws InvalidListenerException When the handler signature is invalid or sender scope cannot be resolved
+     * @throws InvalidListenerException When the handler signature is invalid, or no anchor can be resolved
      */
     public function on(string|object|null $sender, callable $handler, int $priority = 0): void;
 
@@ -90,13 +88,13 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
     /**
      * Return grouped sender-scoped listeners for one dispatched event.
      *
-     * Guidance: Typical owner-aware senders are pooled connections or transport engines; listeners
-     * registered on the owning client (or a service holder that scanned those properties) match after
-     * one {@see \Switon\Core\OwnerAwareInterface::getOwner()} hop.
+     * Guidance: Matches the anchor bucket from {@see on()}; one
+     * {@see \Switon\Core\OwnerAwareInterface::getOwner()} hop when the dispatch sender is not the
+     * anchor itself.
      *
      * Road-signs:
      * - match {@see \Switon\Core\SenderAwareInterface::getSender()} bucket first
-     * - else when sender is owner-aware, match {@see \Switon\Core\OwnerAwareInterface::getOwner()} bucket
+     * - else owner-aware sender → {@see \Switon\Core\OwnerAwareInterface::getOwner()} bucket
      * - else empty
      */
     public function getListenersForSender(object $event): PrioritizedListeners;
