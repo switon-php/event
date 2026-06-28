@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Switon\Eventing\Event;
 
+use Switon\Eventing\ListenerProviderInterface;
+use Switon\Core\SenderAwareInterface;
 use Switon\Eventing\Attribute\EventLevel;
 use Switon\Eventing\Severity;
 
@@ -17,13 +19,19 @@ use Switon\Eventing\Severity;
  * @see \Switon\Eventing\Event\BusinessRegistered
  */
 #[EventLevel(Severity::DEBUG)]
-class ObservabilityRegistered
+class ObservabilityRegistered implements SenderAwareInterface
 {
     public function __construct(
+        public ListenerProviderInterface $sender,
         public string $listener,
         public string $method,
         public string $eventClass,
     ) {
 
+    }
+
+    public function getSender(): ListenerProviderInterface
+    {
+        return $this->sender;
     }
 }

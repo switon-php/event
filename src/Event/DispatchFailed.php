@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Switon\Eventing\Event;
 
+use Switon\Core\SenderAwareInterface;
 use Switon\Eventing\Attribute\EventLevel;
 use Switon\Eventing\Severity;
 use Throwable;
@@ -20,27 +21,35 @@ use Throwable;
  * @see \Switon\Http\Server\Adapter\Swoole::dispatchEvent() Typical emitter
  */
 #[EventLevel(Severity::ERROR)]
-class DispatchFailed
+class DispatchFailed implements SenderAwareInterface
 {
     public function __construct(
-        public string  $eventClass,
-        public string  $exceptionMessage,
-        public string  $exceptionClass,
+        public object $sender,
+        public object $failedEvent,
+        public string $eventClass,
+        public string $exceptionMessage,
+        public string $exceptionClass,
         public ?string $exceptionFile = null,
-        public ?int    $exceptionLine = null,
+        public ?int $exceptionLine = null,
     ) {
-
     }
 
-    /** Builds <code>DispatchFailed</code> from an event instance and a throwable. */
-    public static function from(object $originalEvent, Throwable $exception): self
+    /** Builds <code>DispatchFailed</code> from the dispatcher, failed event, and throwable. */
+    public static function from(object $sender, object $failedEvent, Throwable $exception): self
     {
         return new self(
-            $originalEvent::class,
+            $sender,
+            $failedEvent,
+            $failedEvent::class,
             $exception->getMessage(),
             $exception::class,
             $exception->getFile(),
             $exception->getLine(),
         );
+    }
+
+    public function getSender(): object
+    {
+        return $this->sender;
     }
 }

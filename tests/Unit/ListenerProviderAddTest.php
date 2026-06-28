@@ -38,6 +38,7 @@ class ListenerProviderAddTest extends TestCase
             ->method('dispatch')
             ->with($this->callback(static function (object $event): bool {
                 return $event instanceof BusinessRegistered
+                    && $event->getSender() instanceof ListenerProvider
                     && $event->listener === ListenerProviderAddBusinessListener::class
                     && $event->method === 'onEvent'
                     && $event->eventClass === TestEvent::class;
@@ -95,6 +96,7 @@ class ListenerProviderAddTest extends TestCase
             ->method('dispatch')
             ->with($this->callback(static function (object $event): bool {
                 return $event instanceof WildcardObservabilityRegistered
+                    && $event->getSender() instanceof ListenerProvider
                     && $event->listener === ListenerProviderAddObservabilityListener::class
                     && $event->method === 'onAnyEvent';
             }))

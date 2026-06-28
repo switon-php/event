@@ -182,12 +182,12 @@ class ListenerProvider implements ListenerProviderInterface
                     // Create and dispatch listener registration event
                     if ($eventType === self::WILDCARD) {
                         $registrationEvent = $isObservability
-                            ? new WildcardObservabilityRegistered($listener::class, $method)
-                            : new WildcardBusinessRegistered($listener::class, $method);
+                            ? new WildcardObservabilityRegistered($this, $listener::class, $method)
+                            : new WildcardBusinessRegistered($this, $listener::class, $method);
                     } else {
                         $registrationEvent = $isObservability
-                            ? new ObservabilityRegistered($listener::class, $method, $eventType)
-                            : new BusinessRegistered($listener::class, $method, $eventType);
+                            ? new ObservabilityRegistered($this, $listener::class, $method, $eventType)
+                            : new BusinessRegistered($this, $listener::class, $method, $eventType);
                     }
                     $this->eventDispatcher->dispatch($registrationEvent);
                 }
@@ -199,12 +199,12 @@ class ListenerProvider implements ListenerProviderInterface
                 // Create and dispatch listener registration event
                 if ($eventType === self::WILDCARD) {
                     $registrationEvent = $isObservability
-                        ? new WildcardObservabilityRegistered($listener::class, $method)
-                        : new WildcardBusinessRegistered($listener::class, $method);
+                        ? new WildcardObservabilityRegistered($this, $listener::class, $method)
+                        : new WildcardBusinessRegistered($this, $listener::class, $method);
                 } elseif ($isObservability) {
-                    $registrationEvent = new ObservabilityRegistered($listener::class, $method, $eventType);
+                    $registrationEvent = new ObservabilityRegistered($this, $listener::class, $method, $eventType);
                 } else {
-                    $registrationEvent = new BusinessRegistered($listener::class, $method, $eventType);
+                    $registrationEvent = new BusinessRegistered($this, $listener::class, $method, $eventType);
                 }
                 $this->eventDispatcher->dispatch($registrationEvent);
             } else {
