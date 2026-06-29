@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use ReflectionClass;
 use Switon\Core\Attribute\Autowired;
+use Switon\Core\Attributes;
 use Switon\Core\Categorizable;
 use Switon\Core\Categorized;
 use Switon\Core\ClassName;
@@ -108,9 +109,7 @@ class EventLogger implements EventLoggerInterface, ObservabilityProbe
     protected function parseLevel(string $eventClass): string
     {
         $rClass = new ReflectionClass($eventClass);
-        if (($attributes = $rClass->getAttributes(EventLevel::class)) !== []) {
-            /** @var EventLevel $eventLevel */
-            $eventLevel = $attributes[0]->newInstance();
+        if (($eventLevel = Attributes::first($rClass, EventLevel::class)) !== null) {
             return $eventLevel->severity->value;
         }
         return LogLevel::DEBUG;

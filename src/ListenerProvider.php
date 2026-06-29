@@ -10,6 +10,7 @@ use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
 use Switon\Core\Attribute\Autowired;
+use Switon\Core\Attributes;
 use Switon\Core\Exception\InvalidArgumentException;
 use Switon\Core\OwnerAwareInterface;
 use Switon\Core\Reflections;
@@ -180,13 +181,13 @@ class ListenerProvider implements ListenerProviderInterface
         $rClass = new ReflectionClass($listener);
 
         foreach ($rClass->getMethods(ReflectionMethod::IS_PUBLIC) as $rMethod) {
-            if (($eventAttributes = $rMethod->getAttributes(EventListener::class)) === []) {
+            $eventListener = Attributes::first($rMethod, EventListener::class);
+            if ($eventListener === null) {
                 continue;
             }
 
             $method = $rMethod->getName();
             $handler = [$listener, $method];
-            $eventListener = $eventAttributes[0]->newInstance();
 
             $this->on(null, $handler, $eventListener->priority);
         }
