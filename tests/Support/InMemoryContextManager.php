@@ -10,10 +10,10 @@ use Switon\Core\ContextAware;
 use Switon\Core\ContextManagerInterface;
 use stdClass;
 
-final class InMemoryContextManager implements ContextManagerInterface
+class InMemoryContextManager implements ContextManagerInterface
 {
     /** @var array<int, object> */
-    private array $contexts = [];
+    protected array $contexts = [];
 
     public function getContext(ContextAware $object, int $cid = 0): mixed
     {

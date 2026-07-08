@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Switon\Eventing\Tests\Unit;
 
 use Switon\Eventing\PrioritizedListeners;
-use Switon\Eventing\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use SplDoublyLinkedList;
 
-final class PrioritizedListenersTest extends TestCase
+class PrioritizedListenersTest extends TestCase
 {
     public function testIterationYieldsLowerPriorityGroupsFirst(): void
     {

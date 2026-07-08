@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Switon\Eventing\Tests\Fixtures;
 
-final class SenderScopedListener
+class SenderScopedListener
 {
     public int $calls = 0;
 

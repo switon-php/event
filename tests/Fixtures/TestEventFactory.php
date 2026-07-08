@@ -64,7 +64,7 @@ class TestEventFactory
     {
         return new class ($category, $message) implements Categorizable {
             public function __construct(
-                private string $category,
+                protected string $category,
                 public string  $message
             ) {
             }
@@ -133,7 +133,7 @@ class TestEventFactory
         return new class ($methodName) {
             public array $handledEvents = [];
 
-            public function __construct(private string $methodName)
+            public function __construct(protected string $methodName)
             {
             }
 
@@ -163,41 +163,41 @@ abstract class TestLeveledEventBase
 }
 
 #[EventLevel(Severity::DEBUG)]
-final class TestLeveledDebugEvent extends TestLeveledEventBase
+class TestLeveledDebugEvent extends TestLeveledEventBase
 {
 }
 
 #[EventLevel(Severity::INFO)]
-final class TestLeveledInfoEvent extends TestLeveledEventBase
+class TestLeveledInfoEvent extends TestLeveledEventBase
 {
 }
 
 #[EventLevel(Severity::NOTICE)]
-final class TestLeveledNoticeEvent extends TestLeveledEventBase
+class TestLeveledNoticeEvent extends TestLeveledEventBase
 {
 }
 
 #[EventLevel(Severity::WARNING)]
-final class TestLeveledWarningEvent extends TestLeveledEventBase
+class TestLeveledWarningEvent extends TestLeveledEventBase
 {
 }
 
 #[EventLevel(Severity::ERROR)]
-final class TestLeveledErrorEvent extends TestLeveledEventBase
+class TestLeveledErrorEvent extends TestLeveledEventBase
 {
 }
 
 #[EventLevel(Severity::CRITICAL)]
-final class TestLeveledCriticalEvent extends TestLeveledEventBase
+class TestLeveledCriticalEvent extends TestLeveledEventBase
 {
 }
 
 #[EventLevel(Severity::ALERT)]
-final class TestLeveledAlertEvent extends TestLeveledEventBase
+class TestLeveledAlertEvent extends TestLeveledEventBase
 {
 }
 
 #[EventLevel(Severity::EMERGENCY)]
-final class TestLeveledEmergencyEvent extends TestLeveledEventBase
+class TestLeveledEmergencyEvent extends TestLeveledEventBase
 {
 }

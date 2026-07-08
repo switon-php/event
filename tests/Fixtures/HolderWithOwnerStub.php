@@ -6,7 +6,7 @@ namespace Switon\Eventing\Tests\Fixtures;
 
 use Switon\Core\OwnerAwareInterface;
 
-final class HolderWithOwnerStub
+class HolderWithOwnerStub
 {
     public function __construct(public OwnerHolderStub $client)
     {

@@ -24,12 +24,12 @@ use Traversable;
 class SimpleContainer implements ContainerInterface
 {
     /** @var array<string, mixed> */
-    private array $definitions = [];
+    protected array $definitions = [];
 
     /** @var array<string, mixed> */
-    private array $instances = [];
+    protected array $instances = [];
 
-    private ?SimpleInjector $injector = null;
+    protected ?SimpleInjector $injector = null;
 
     /**
      * @param array<string, mixed> $definitions
@@ -157,12 +157,12 @@ class SimpleContainer implements ContainerInterface
         return $this->getInjector()->resolveDependency($type, $name, $value);
     }
 
-    private function getInjector(): SimpleInjector
+    protected function getInjector(): SimpleInjector
     {
         return $this->injector ??= new SimpleInjector($this);
     }
 
-    private function resolveDefinition(string $id, mixed $definition): mixed
+    protected function resolveDefinition(string $id, mixed $definition): mixed
     {
         if (is_object($definition)) {
             return $definition;
@@ -194,7 +194,7 @@ class SimpleContainer implements ContainerInterface
     /**
      * @param array<string, mixed> $parameters
      */
-    private function createInstance(string $className, array $parameters = []): object
+    protected function createInstance(string $className, array $parameters = []): object
     {
         $reflection = new ReflectionClass($className);
         $constructor = $reflection->getConstructor();
@@ -240,9 +240,9 @@ class SimpleContainer implements ContainerInterface
     }
 }
 
-final class SimpleInjector implements InjectorInterface
+class SimpleInjector implements InjectorInterface
 {
-    public function __construct(private readonly SimpleContainer $container)
+    public function __construct(protected readonly SimpleContainer $container)
     {
     }
 
@@ -283,7 +283,7 @@ final class SimpleInjector implements InjectorInterface
     /**
      * @param array<string, mixed> $parameters
      */
-    private function resolvePropertyValue(object $object, ReflectionProperty $property, array $parameters): mixed
+    protected function resolvePropertyValue(object $object, ReflectionProperty $property, array $parameters): mixed
     {
         $propertyName = $property->getName();
 

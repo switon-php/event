@@ -6,7 +6,7 @@ namespace Switon\Eventing\Tests\Unit;
 
 use Switon\Eventing\ListenerProvider;
 use Switon\Eventing\Tests\Fixtures\TestEvent;
-use Switon\Eventing\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class ListenerProviderListTest extends TestCase
 {

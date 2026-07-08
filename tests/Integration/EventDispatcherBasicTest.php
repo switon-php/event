@@ -21,7 +21,7 @@ use Switon\Eventing\Tests\TestCase;
  *
  * Tests basic event dispatching, listener invocation, and context tracking.
  */
-final class TestableEventDispatcher extends EventDispatcher
+class TestableEventDispatcher extends EventDispatcher
 {
     public function disableListenerProvider(): void
     {

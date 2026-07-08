@@ -6,7 +6,7 @@ namespace Switon\Eventing\Tests\Support;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-final class RecordingEventDispatcher implements EventDispatcherInterface
+class RecordingEventDispatcher implements EventDispatcherInterface
 {
     /** @var list<object> */
     public array $dispatchedEvents = [];

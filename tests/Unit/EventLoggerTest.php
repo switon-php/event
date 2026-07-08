@@ -24,7 +24,7 @@ use RuntimeException;
  * Unit coverage for {@see EventLogger} (same scenarios as integration tests; unit suite only).
  */
 #[AllowMockObjectsWithoutExpectations]
-final class EventLoggerTest extends TestCase
+class EventLoggerTest extends TestCase
 {
     protected EventLogger $eventLogger;
     protected MockObject|LoggerInterface $logger;

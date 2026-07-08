@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Switon\Eventing\Tests\Fixtures;
 
-final class HolderWithEmitterStub
+class HolderWithEmitterStub
 {
     public function __construct(public SenderEmitterStub $emitter)
     {

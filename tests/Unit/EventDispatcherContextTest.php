@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Switon\Eventing\Tests\Unit;
 
 use Switon\Eventing\EventDispatcherContext;
-use Switon\Eventing\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class EventDispatcherContextTest extends TestCase
 {

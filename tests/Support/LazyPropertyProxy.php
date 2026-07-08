@@ -12,7 +12,7 @@ use Error;
 use function call_user_func_array;
 use function str_starts_with;
 
-final class LazyPropertyProxy implements Lazy
+class LazyPropertyProxy implements Lazy
 {
     public function __construct(
         protected ContainerInterface $container,

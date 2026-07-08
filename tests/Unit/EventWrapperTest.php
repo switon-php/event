@@ -8,7 +8,7 @@ use Switon\Eventing\EventWrapper;
 use Switon\Eventing\Tests\Fixtures\TestEvent;
 use Switon\Eventing\Tests\Fixtures\TestEventWithObject;
 use Switon\Eventing\Tests\Fixtures\TestJsonSerializableEvent;
-use Switon\Eventing\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**

@@ -7,7 +7,7 @@ namespace Switon\Eventing\Tests\Support;
 use Switon\Eventing\ListenerProviderInterface;
 use Switon\Eventing\PrioritizedListeners;
 
-final class NullListenerProvider implements ListenerProviderInterface
+class NullListenerProvider implements ListenerProviderInterface
 {
     public function on(string|object|null $sender, callable $handler, int $priority = 0): void
     {

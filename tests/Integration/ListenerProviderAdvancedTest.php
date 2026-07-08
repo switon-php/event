@@ -141,7 +141,7 @@ class ListenerProviderAdvancedTest extends TestCase
         $executionOrder = [];
 
         $listener = new class ($executionOrder) {
-            public function __construct(private array &$executionOrder)
+            public function __construct(protected array &$executionOrder)
             {
             }
 

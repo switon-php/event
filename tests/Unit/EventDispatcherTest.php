@@ -14,9 +14,9 @@ use Switon\Eventing\Tests\Fixtures\TestEvent;
 use Switon\Eventing\Tests\Fixtures\TestObservabilityListener;
 use Switon\Eventing\Tests\Support\InMemoryContextManager;
 use Switon\Eventing\Tests\Support\NullListenerProvider;
-use Switon\Eventing\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
-final class EventDispatcherTest extends TestCase
+class EventDispatcherTest extends TestCase
 {
     public function testDispatchReturnsEventUnchangedWhenListenerProviderIsNotWired(): void
     {
@@ -95,7 +95,7 @@ final class EventDispatcherTest extends TestCase
         self::assertSame(1, $ctx->businessCallCounts[$bizKey] ?? 0);
     }
 
-    private function createDispatcher(?ListenerProviderInterface $listenerProvider): EventDispatcher
+    protected function createDispatcher(?ListenerProviderInterface $listenerProvider): EventDispatcher
     {
         return new class (new InMemoryContextManager(), $listenerProvider) extends EventDispatcher {
             public function __construct(ContextManagerInterface $contextManager, ?ListenerProviderInterface $listenerProvider)
@@ -110,11 +110,11 @@ final class EventDispatcherTest extends TestCase
 /**
  * Minimal listener provider for dispatcher unit tests (fixed wildcard vs event-specific buckets).
  */
-final class StubListenerProvider implements ListenerProviderInterface
+class StubListenerProvider implements ListenerProviderInterface
 {
     public function __construct(
-        private readonly PrioritizedListeners $wildcard,
-        private readonly PrioritizedListeners $specific,
+        protected readonly PrioritizedListeners $wildcard,
+        protected readonly PrioritizedListeners $specific,
     ) {
     }
 

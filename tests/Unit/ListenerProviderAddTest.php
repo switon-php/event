@@ -238,10 +238,10 @@ class ListenerProviderAddUnionObservabilityListener implements ObservabilityProb
     }
 }
 
-final class ListenerProviderAddNotFound extends RuntimeException implements NotFoundExceptionInterface
+class ListenerProviderAddNotFound extends RuntimeException implements NotFoundExceptionInterface
 {
 }
 
-final class ListenerProviderAddContainerException extends RuntimeException implements ContainerExceptionInterface
+class ListenerProviderAddContainerException extends RuntimeException implements ContainerExceptionInterface
 {
 }

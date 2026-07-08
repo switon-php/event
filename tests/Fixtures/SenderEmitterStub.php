@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Switon\Eventing\Tests\Fixtures;
 
-final class SenderEmitterStub
+class SenderEmitterStub
 {
 }

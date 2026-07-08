@@ -38,7 +38,7 @@ use Switon\Eventing\Tests\TestCase;
  * - HTTP client: {@see HolderWithHttpClientStub} + {@see EngineAwareSenderTestEvent} /
  *   {@see HttpClientSenderTestEvent} stand in for <code>$service->httpClient</code> + engine or client events.
  */
-final class ListenerProviderSenderScopedTest extends TestCase
+class ListenerProviderSenderScopedTest extends TestCase
 {
     protected ListenerProvider $provider;
 

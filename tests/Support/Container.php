@@ -11,7 +11,7 @@ use Switon\Core\ContextManagerInterface;
 use Switon\Core\PathAlias;
 use Switon\Core\PathAliasInterface;
 
-final class Container extends SimpleContainer
+class Container extends SimpleContainer
 {
     public function __construct(array $definitions = [])
     {
