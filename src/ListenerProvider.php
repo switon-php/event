@@ -67,19 +67,14 @@ class ListenerProvider implements ListenerProviderInterface
 
     /** @var array<string, PrioritizedListeners> Listeners for any sender, keyed by event FQCN or wildcard. */
     protected array $listeners = [];
-
     /** @var WeakMap<object, array<string, PrioritizedListeners>> Sender-scoped listeners keyed by emitter instance. */
     protected WeakMap $senderListeners;
-
     /** Shared empty listener bucket returned for event types with no registered listeners. */
     protected PrioritizedListeners $emptyListeners;
-
     /** @var array<int, object> Registered listener objects keyed by object ID. */
     protected array $registered = [];
-
     /** @var array<string, true> Observability listener keys. */
     protected array $observabilityListenerRegistry = [];
-
     /** @var array<string, true> Business listener keys. */
     protected array $businessListenerRegistry = [];
 

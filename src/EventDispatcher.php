@@ -36,7 +36,6 @@ use function is_array;
 class EventDispatcher implements EventDispatcherInterface
 {
     #[Autowired] protected ContextManagerInterface $contextManager;
-
     #[Autowired] protected ListenerProviderInterface|Lazy $listenerProvider;
 
     /** {@inheritDoc} */

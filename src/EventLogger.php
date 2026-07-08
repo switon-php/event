@@ -48,10 +48,8 @@ class EventLogger implements EventLoggerInterface, ObservabilityProbe
 
     /** @var array<string, string> Cached log levels by event class. */
     #[Autowired] protected array $levels = [];
-
     /** @var array<string, string> Cached categories by event class. */
     #[Autowired] protected array $categories = [];
-
     /** Enables/disables automatic event logging listener registration. */
     #[Autowired] protected bool $enabled = true;
 

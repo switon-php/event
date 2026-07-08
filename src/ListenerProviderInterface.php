@@ -40,7 +40,7 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
      * An object registers on an anchor <code>O</code>: registration derives <code>O</code> from event
      * sender type <code>T</code> ({@see \Switon\Core\SenderAwareInterface::getSender()}) and, when
      * <code>T</code> is owner-aware, from {@see \Switon\Core\OwnerAwareInterface::getOwner()}; dispatch
-     * must reach the same <code>O</code> via {@see getListenersForSender()}.
+     * must reach the same <code>O</code> via `getListenersForSender()`.
      *
      * Guidance: Per-instance listening only works when registration and dispatch share one anchor—the
      * instance you intend to monitor; if <code>$sender</code> cannot resolve that anchor, the emitter
@@ -67,7 +67,7 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
     /**
      * Register a listener class or instance (any sender).
      *
-     * Discovers public methods marked with <code>#[EventListener]</code> and delegates to {@see on()}.
+     * Discovers public methods marked with <code>#[EventListener]</code> and delegates to `on()`.
      *
      * @param string|object $listener Class name or instance
      *
@@ -88,7 +88,7 @@ interface ListenerProviderInterface extends PsrListenerProviderInterface
     /**
      * Return grouped sender-scoped listeners for one dispatched event.
      *
-     * Guidance: Matches the anchor bucket from {@see on()}; one
+     * Guidance: Matches the anchor bucket from `on()`; one
      * {@see \Switon\Core\OwnerAwareInterface::getOwner()} hop when the dispatch sender is not the
      * anchor itself.
      *

@@ -14,7 +14,7 @@ use Throwable;
  *
  * Dispatch directly from failure handling paths to avoid recursive failure loops.
  *
- * Log category: <code>switon.eventing.event.dispatch.failed</code>
+ * Log category: <code>switon.eventing.dispatch.failed</code>
  *
  * @see \Switon\Eventing\EventDispatcherInterface
  * @see \Switon\Eventing\EventDispatcher

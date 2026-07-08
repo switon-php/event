@@ -31,6 +31,7 @@ class ListenerDiscovery implements ListenerDiscoveryInterface
     #[Autowired] protected ClassScannerInterface $classScanner;
     #[Autowired] protected ComposerExtraInterface $composerExtra;
     #[Autowired] protected ListenerProviderInterface $listenerProvider;
+
     /** @var array<string, string> */
     #[Autowired] protected array $listeners
         = [
