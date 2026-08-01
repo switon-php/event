@@ -53,7 +53,7 @@ class UserListener
 }
 ```
 
-Docs: https://docs.switon.dev/latest/event
+Docs: https://github.com/switon-php/event/blob/main/docs/README.md
 
 ## License
 

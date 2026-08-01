@@ -158,4 +158,4 @@ bash bin/console config:options 'Switon\Eventing\EventLoggerInterface'
 
 - **To check listener registration and common setup questions:** [FAQ](faq.md#event-faq)
 - **To understand why dispatch stays synchronous and observability-aware:** [Design Rationale](design.md#design-rationale)
-- **To connect event output to logging policy:** [Log Package](../../log/docs/README.md)
+- **To connect event output to logging policy:** [Log Package](https://github.com/switon-php/log/blob/main/docs/README.md)
